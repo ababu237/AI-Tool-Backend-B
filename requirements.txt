@@ -18,10 +18,10 @@ PyPDF2==3.0.1
 numpy>=1.26.0,<2.0.0
 pandas>=2.1.0,<3.0.0
 
-# Vector Search and Embeddings - Updated for Python 3.11+
+# Vector Search and Embeddings - Fixed version conflicts
 faiss-cpu>=1.9.0
 langchain-community==0.0.21
-langchain-core==0.1.21
+langchain-core>=0.1.24,<0.2
 langchain==0.1.0
 tiktoken==0.5.2
 
