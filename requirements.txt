@@ -1,4 +1,4 @@
-﻿# Core FastAPI and ASGI server
+# Core FastAPI and ASGI server
 fastapi==0.104.1
 uvicorn[standard]==0.29.0
 python-multipart==0.0.6
@@ -18,14 +18,22 @@ PyPDF2==3.0.1
 numpy>=1.26.0,<2.0.0
 pandas>=2.1.0,<3.0.0
 
-# Vector Search - Only include what we actually use
+# Vector Search
 faiss-cpu>=1.9.0
 
-# Additional dependencies
+# Environment and Config
 python-dotenv==1.0.0
 pydantic>=2.0.0,<3.0.0
 pydantic-settings>=2.0.0,<3.0.0
 
-# HTTP and utility
+# HTTP and File IO
 httpx==0.25.2
 aiofiles==23.2.1
+
+# ---- Add these for reliability ----
+# Needed for async event loops & compatibility
+anyio>=3.7.0,<5.0.0
+# Ensures uvicorn works smoothly with FastAPI
+h11>=0.14.0
+# Makes sure pip resolves properly
+setuptools>=68.0.0
