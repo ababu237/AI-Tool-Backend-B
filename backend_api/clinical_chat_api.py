@@ -1,13 +1,26 @@
-import os
+﻿import os
 import uuid
 import json
 import base64
-from fastapi import Form
+from fastapi import FastAPI, Form
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from gtts import gTTS
 from deep_translator import GoogleTranslator
 from langdetect import detect
 import openai
+
+# Create FastAPI app
+app = FastAPI(title="Clinical Chat API", description="AI-powered medical assistant with multi-language support")
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 AUDIO_FOLDER = "audios"
 os.makedirs(AUDIO_FOLDER, exist_ok=True)
@@ -45,40 +58,59 @@ def text_to_speech_base64(text: str) -> str:
     tts.save(filepath)
     
     with open(filepath, "rb") as audio_file:
-        audio_base64 = base64.b64encode(audio_file.read()).decode('utf-8')
+        audio_base64 = base64.b64encode(audio_file.read()).decode('\''utf-8'\'')
     
     os.remove(filepath)
     return audio_base64
 
-async def clinical_chat(prompt: str, output_language: str = 'en'):
-    openai.api_key = OPENAI_API_KEY
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful clinical assistant."},
-            {"role": "user", "content": prompt}
-        ]
-    )
-    answer = response.choices[0].message.content.strip()
-    
-    if output_language != 'en':
-        answer = translate_text(answer, output_language)
-    
-    audio_b64 = text_to_speech_base64(answer)
-    
-    return {
-        "answer": answer,
-        "audio_base64": audio_b64,
-        "audio_format": "mp3"
-    }
-
-def get_api_info():
+@app.get("/")
+async def root():
     return {
         "message": "Clinical Chat API",
         "description": "AI-powered medical assistant with multi-language support",
         "endpoints": {
             "clinical_chat": "POST /clinical_chat",
-            "api_info": "POST /api_info",
+            "health": "GET /health",
             "documentation": "/docs"
         }
     }
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "service": "clinical_chat"}
+
+@app.post("/clinical_chat")
+async def clinical_chat_endpoint(prompt: str = Form(...), output_language: str = Form('\''en'\'')):
+    try:
+        openai.api_key = OPENAI_API_KEY
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful clinical assistant."},
+                {"role": "user", "content": prompt}
+            ]
+        )
+        answer = response.choices[0].message.content.strip()
+        
+        if output_language != '\''en'\'':
+            answer = translate_text(answer, output_language)
+        
+        audio_b64 = text_to_speech_base64(answer)
+        
+        return {
+            "success": True,
+            "data": {
+                "answer": answer,
+                "audio_base64": audio_b64,
+                "audio_format": "mp3"
+            }
+        }
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": str(e)}
+        )
+
+if __name__ == "____main____":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
