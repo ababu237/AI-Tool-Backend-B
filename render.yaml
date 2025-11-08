@@ -1,7 +1,7 @@
 ﻿services:
   - type: web
     name: ai-tool-backend
-    runtime: python
+    env: python
     region: oregon
     plan: free
     branch: Backend
@@ -10,8 +10,3 @@
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.9
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: MASTER_API_KEY
-        sync: false
-    autoDeploy: true
