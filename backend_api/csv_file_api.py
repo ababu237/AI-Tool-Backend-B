@@ -32,6 +32,14 @@ async def root():
 async def health():
     return {"status": "healthy", "service": "csv_processing"}
 
+# Helper function for master_backend_api compatibility
+async def process_csv(file: UploadFile, question: str, output_language: str = 'en'):
+    """Legacy function for master_backend_api compatibility"""
+    return {
+        "answer": "CSV processing endpoint - implementation pending",
+        "filename": file.filename
+    }
+
 @app.post("/process_csv")
 async def process_csv_endpoint(
     file: UploadFile = File(...),

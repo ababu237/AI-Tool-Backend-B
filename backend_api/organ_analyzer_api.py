@@ -33,6 +33,19 @@ async def root():
 async def health():
     return {"status": "healthy", "service": "organ_analyzer"}
 
+# Helper functions for master_backend_api compatibility
+async def api_analyze_organ_scan(image: UploadFile, organ: str, input_language: str = 'en', output_language: str = 'en'):
+    """Legacy function for master_backend_api compatibility"""
+    return {
+        "analysis": "Organ analysis endpoint - implementation pending",
+        "organ": organ,
+        "filename": image.filename
+    }
+
+async def test_organ_analyzer_api(organ: str, input_language: str = 'en', output_language: str = 'en'):
+    """Legacy function for master_backend_api compatibility"""
+    return {"message": f"Test organ analyzer for {organ}"}
+
 @app.post("/analyze_organ_scan")
 async def analyze_organ_scan_endpoint(
     image: UploadFile = File(...),

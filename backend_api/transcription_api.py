@@ -33,6 +33,18 @@ async def root():
 async def health():
     return {"status": "healthy", "service": "transcription"}
 
+# Helper functions for master_backend_api compatibility
+async def api_transcribe_audio(audio_file: UploadFile, output_language: str = 'en'):
+    """Legacy function for master_backend_api compatibility"""
+    return {
+        "transcription": "Transcription endpoint - implementation pending",
+        "filename": audio_file.filename
+    }
+
+async def test_transcription_api(output_language: str = 'en'):
+    """Legacy function for master_backend_api compatibility"""
+    return {"message": "Test transcription endpoint"}
+
 @app.post("/transcribe_audio")
 async def transcribe_audio_endpoint(
     audio_file: UploadFile = File(...),

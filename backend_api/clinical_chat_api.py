@@ -58,7 +58,7 @@ def text_to_speech_base64(text: str) -> str:
     tts.save(filepath)
     
     with open(filepath, "rb") as audio_file:
-        audio_base64 = base64.b64encode(audio_file.read()).decode('\''utf-8'\'')
+        audio_base64 = base64.b64encode(audio_file.read()).decode("utf-8")
     
     os.remove(filepath)
     return audio_base64
@@ -79,8 +79,37 @@ async def root():
 async def health():
     return {"status": "healthy", "service": "clinical_chat"}
 
+# Helper function for master_backend_api compatibility
+async def clinical_chat(message: str, input_language: str = "en", output_language: str = "en", enable_tts: bool = False):
+    """Legacy function for master_backend_api compatibility"""
+    try:
+        openai.api_key = OPENAI_API_KEY
+        conversation_history.append({"role": "user", "content": message})
+        
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are a helpful clinical assistant."},
+                *conversation_history
+            ]
+        )
+        answer = response.choices[0].message.content.strip()
+        conversation_history.append({"role": "assistant", "content": answer})
+        
+        if output_language != "en":
+            answer = translate_text(answer, output_language)
+        
+        result = {"answer": answer}
+        if enable_tts:
+            result["audio_base64"] = text_to_speech_base64(answer)
+            result["audio_format"] = "mp3"
+        
+        return result
+    except Exception as e:
+        return {"error": str(e)}
+
 @app.post("/clinical_chat")
-async def clinical_chat_endpoint(prompt: str = Form(...), output_language: str = Form('\''en'\'')):
+async def clinical_chat_endpoint(prompt: str = Form(...), output_language: str = Form("en")):
     try:
         openai.api_key = OPENAI_API_KEY
         response = openai.ChatCompletion.create(
@@ -92,7 +121,7 @@ async def clinical_chat_endpoint(prompt: str = Form(...), output_language: str =
         )
         answer = response.choices[0].message.content.strip()
         
-        if output_language != '\''en'\'':
+        if output_language != "en":
             answer = translate_text(answer, output_language)
         
         audio_b64 = text_to_speech_base64(answer)
@@ -111,6 +140,6 @@ async def clinical_chat_endpoint(prompt: str = Form(...), output_language: str =
             content={"success": False, "error": str(e)}
         )
 
-if __name__ == "____main____":
+if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8001)

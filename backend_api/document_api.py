@@ -44,6 +44,14 @@ async def root():
 async def health():
     return {"status": "healthy", "service": "document_processing"}
 
+# Helper function for master_backend_api compatibility
+async def process_document(file: UploadFile, question: str, output_language: str = 'en'):
+    """Legacy function for master_backend_api compatibility"""
+    return {
+        "answer": "Document processing endpoint - implementation pending",
+        "filename": file.filename
+    }
+
 @app.post("/process_document")
 async def process_document_endpoint(
     file: UploadFile = File(...),
