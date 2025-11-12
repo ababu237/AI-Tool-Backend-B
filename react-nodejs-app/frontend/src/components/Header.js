@@ -9,10 +9,12 @@ const Header = () => {
 
   // Load user data from localStorage on mount
   useEffect(() => {
-    const savedName = localStorage.getItem('userName');
-    const savedInitials = localStorage.getItem('userInitials');
-    if (savedName) setUserName(savedName);
-    if (savedInitials) setUserInitials(savedInitials);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const savedName = localStorage.getItem('userName');
+      const savedInitials = localStorage.getItem('userInitials');
+      if (savedName) setUserName(savedName);
+      if (savedInitials) setUserInitials(savedInitials);
+    }
   }, []);
 
   // Generate initials from name
@@ -26,14 +28,16 @@ const Header = () => {
 
   // Handle profile edit
   const handleProfileEdit = () => {
-    const newName = prompt('Enter your name:', userName);
-    if (newName && newName.trim()) {
-      const trimmedName = newName.trim();
-      setUserName(trimmedName);
-      const newInitials = generateInitials(trimmedName);
-      setUserInitials(newInitials);
-      localStorage.setItem('userName', trimmedName);
-      localStorage.setItem('userInitials', newInitials);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const newName = prompt('Enter your name:', userName);
+      if (newName && newName.trim()) {
+        const trimmedName = newName.trim();
+        setUserName(trimmedName);
+        const newInitials = generateInitials(trimmedName);
+        setUserInitials(newInitials);
+        localStorage.setItem('userName', trimmedName);
+        localStorage.setItem('userInitials', newInitials);
+      }
     }
   };
 
