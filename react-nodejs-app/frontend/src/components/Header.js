@@ -2,6 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import './Header.css';
 
+// Safe localStorage access helper
+const safeLocalStorage = {
+  getItem: (key) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        return window.localStorage.getItem(key);
+      }
+    } catch (e) {
+      return null;
+    }
+    return null;
+  },
+  setItem: (key, value) => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        window.localStorage.setItem(key, value);
+      }
+    } catch (e) {
+      // Silently fail
+    }
+  }
+};
+
 const Header = () => {
   const location = useLocation();
   const [userName, setUserName] = useState('User name');
@@ -9,12 +32,10 @@ const Header = () => {
 
   // Load user data from localStorage on mount
   useEffect(() => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const savedName = localStorage.getItem('userName');
-      const savedInitials = localStorage.getItem('userInitials');
-      if (savedName) setUserName(savedName);
-      if (savedInitials) setUserInitials(savedInitials);
-    }
+    const savedName = safeLocalStorage.getItem('userName');
+    const savedInitials = safeLocalStorage.getItem('userInitials');
+    if (savedName) setUserName(savedName);
+    if (savedInitials) setUserInitials(savedInitials);
   }, []);
 
   // Generate initials from name
@@ -28,16 +49,14 @@ const Header = () => {
 
   // Handle profile edit
   const handleProfileEdit = () => {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const newName = prompt('Enter your name:', userName);
-      if (newName && newName.trim()) {
-        const trimmedName = newName.trim();
-        setUserName(trimmedName);
-        const newInitials = generateInitials(trimmedName);
-        setUserInitials(newInitials);
-        localStorage.setItem('userName', trimmedName);
-        localStorage.setItem('userInitials', newInitials);
-      }
+    const newName = prompt('Enter your name:', userName);
+    if (newName && newName.trim()) {
+      const trimmedName = newName.trim();
+      setUserName(trimmedName);
+      const newInitials = generateInitials(trimmedName);
+      setUserInitials(newInitials);
+      safeLocalStorage.setItem('userName', trimmedName);
+      safeLocalStorage.setItem('userInitials', newInitials);
     }
   };
 
