@@ -125,6 +125,21 @@ app.use('/api/analyze-organ', organAnalyzerRoutes);
 app.use('/api/analyze-document', documentRoutes);
 app.use('/api/analyze-csv', csvRoutes);
 
+// Serve static files from React build
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, '../frontend/build');
+  app.use(express.static(frontendBuildPath));
+  
+  // Serve index.html for all non-API routes
+  app.get('*', (req, res, next) => {
+    // Skip if it's an API route
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+}
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err);
