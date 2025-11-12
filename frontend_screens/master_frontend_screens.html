@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="backend-origin" content="https://ai-tool-backend-4.onrender.com" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Master Frontend Screens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { margin:0; font-family:'Plus Jakarta Sans',sans-serif; background:#fff; color:#111; }
+  /* Removed top header & nav (controlled by external bottom navigation) */
+  .frame-wrapper { position:relative; width:100%; height:calc(100vh - 60px); } /* leave room for bottom bar outside */
+    iframe { position:absolute; inset:0; width:100%; height:100%; border:0; display:none; background:#fff; }
+    iframe.active { display:block; }
+    .loading { font-size:14px; padding:12px; }
+    footer { background:#f5f5f5; padding:8px 16px; font-size:12px; text-align:center; }
+    @media (max-width:800px){ nav button { flex:1 0 50%; } }
+  </style>
+</head>
+<body>
+  <!-- Top header & nav removed per request; external navigation should call window.switchMasterScreen(id) -->
+  <div class="frame-wrapper" id="frames">
+    <!-- Each iframe points to existing fully-styled screen -->
+    <iframe id="frame-home" class="active" title="Home" src="index.html"></iframe>
+    <iframe id="frame-clinical" title="Clinical Chat" src="clinical_chat.html"></iframe>
+    <iframe id="frame-doccsv" title="Document / CSV" src="healthcare-assistant-document-analyzer.html"></iframe>
+    <iframe id="frame-organ" title="Organ Analyzer" src="organ-analyzer.html"></iframe>
+    <iframe id="frame-speech" title="Speech to Text" src="speech-to-text.html"></iframe>
+    <iframe id="frame-tts" title="Text Translation & TTS" src="healthcare-assistant-text-to-speech.html"></iframe>
+  </div>
+  <footer>
+    Master Screens Aggregator - Reuses existing standalone pages via iframes (isolation avoids CSS conflicts).
+  </footer>
+  <script>
+    // Public API for external navigation (e.g., bottom nav bar in another wrapper)
+    window.switchMasterScreen = function(id){
+      const valid = ['home','clinical','doccsv','organ','speech','tts'];
+      if(!valid.includes(id)) { console.warn('Unknown screen id', id); return; }
+      [...document.querySelectorAll('iframe')].forEach(f=>f.classList.remove('active'));
+      const frame = document.getElementById('frame-'+id);
+      if(frame) frame.classList.add('active');
+    };
+    // Default to home if none displayed
+    window.switchMasterScreen('home');
+
+    // Standardize Velocity logo placement inside each screen (top-left fixed offset)
+    const LOGO_SVG = `
+      <div class="velocity-logo-wrapper" data-velocity-logo>
+        <a href="/" class="velocity-logo-link" aria-label="Velocity Clinical Research Home">
+          <svg width="120" height="54" viewBox="0 0 120 54" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="49" cy="46" r="4" fill="#35C1D8" />
+            <circle cx="61" cy="46" r="4" fill="#35BC4E" />
+            <circle cx="73" cy="46" r="4" fill="#E84242" />
+            <text x="0" y="28" fill="#ffffff" font-family="Plus Jakarta Sans, Arial" font-size="26" font-weight="600">Velocity</text>
+          </svg>
+        </a>
+      </div>`;
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .velocity-logo-wrapper { position:fixed; top:8px; left:12px; z-index:9999; display:flex; align-items:center; }
+      .velocity-logo-wrapper svg { display:block; }
+      .velocity-logo-link { text-decoration:none; line-height:0; }
+      /* Provide a subtle drop shadow for contrast on light/dark */
+      .velocity-logo-wrapper svg text { paint-order: stroke; stroke: #14223d; stroke-width: 1px; stroke-opacity: .35; }
+      .velocity-logo-wrapper:hover { filter:brightness(1.08); }
+    `;
+    document.head.appendChild(style);
+
+    function injectLogoInto(frame){
+      try {
+        const doc = frame.contentDocument || frame.contentWindow?.document; if(!doc) return;
+        if(doc.querySelector('[data-velocity-logo]')) return; // already injected
+        // Remove pre-existing top brand headers if any (optional minimal heuristic)
+        const legacyHeader = doc.querySelector('.site-header, header');
+        if(legacyHeader && !legacyHeader.querySelector('[data-preserve-header]')){
+          legacyHeader.style.paddingTop = '70px'; // maintain spacing where content expected
+        }
+        const host = doc.body || doc.documentElement;
+        const temp = doc.createElement('div');
+        temp.innerHTML = LOGO_SVG;
+        host.appendChild(temp.firstElementChild);
+      } catch(e){ console.warn('Logo inject failed', e); }
+    }
+
+    function injectAll(){
+      document.querySelectorAll('iframe[id^="frame-"]').forEach(f=>{
+        if(f.complete) injectLogoInto(f);
+      });
+    }
+
+    // Observe load events
+    document.querySelectorAll('iframe[id^="frame-"]').forEach(f=>{
+      f.addEventListener('load', ()=>injectLogoInto(f));
+    });
+    // Periodic fallback (in case of delayed DOM mutations)
+    setTimeout(injectAll, 1500);
+    setTimeout(injectAll, 4000);
+  </script>
+  </script>
+</body>
+</html>

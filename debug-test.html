@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Debug Test</title>
+  </head>
+  <body>
+    <h1>API Debug Test</h1>
+
+    <h2>Test Translation</h2>
+    <button onclick="testTranslation()">Test Translation</button>
+    <div id="translationResult"></div>
+
+    <h2>Test Text-to-Speech</h2>
+    <button onclick="testTTS()">Test TTS</button>
+    <div id="ttsResult"></div>
+
+    <h2>Test Transcription</h2>
+    <input type="file" id="audioFile" accept="audio/*" />
+    <button onclick="testTranscription()">Test Transcription</button>
+    <div id="transcriptionResult"></div>
+
+    <script>
+      async function testTranslation() {
+        try {
+          const response = await fetch("http://localhost:5001/api/translate", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              text: "Hello world",
+              sourceLanguage: "en",
+              targetLanguage: "es",
+            }),
+          });
+          const data = await response.json();
+          document.getElementById("translationResult").innerHTML =
+            "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+        } catch (error) {
+          document.getElementById("translationResult").innerHTML =
+            "Error: " + error.message;
+        }
+      }
+
+      async function testTTS() {
+        try {
+          const response = await fetch(
+            "http://localhost:5001/api/translation/text-to-speech",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                text: "Hello world",
+                language: "en",
+              }),
+            }
+          );
+          const data = await response.json();
+          document.getElementById("ttsResult").innerHTML =
+            "<pre>" +
+            JSON.stringify(
+              {
+                ...data,
+                data: {
+                  ...data.data,
+                  audioBase64: data.data.audioBase64
+                    ? "[BASE64 DATA PRESENT]"
+                    : "NO AUDIO",
+                },
+              },
+              null,
+              2
+            ) +
+            "</pre>";
+        } catch (error) {
+          document.getElementById("ttsResult").innerHTML =
+            "Error: " + error.message;
+        }
+      }
+
+      async function testTranscription() {
+        const fileInput = document.getElementById("audioFile");
+        if (!fileInput.files[0]) {
+          alert("Please select an audio file");
+          return;
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append("audio", fileInput.files[0]);
+          formData.append("outputLanguage", "en");
+
+          const response = await fetch(
+            "http://localhost:5001/api/transcription",
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+          const data = await response.json();
+          document.getElementById("transcriptionResult").innerHTML =
+            "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+        } catch (error) {
+          document.getElementById("transcriptionResult").innerHTML =
+            "Error: " + error.message;
+        }
+      }
+    </script>
+  </body>
+</html>

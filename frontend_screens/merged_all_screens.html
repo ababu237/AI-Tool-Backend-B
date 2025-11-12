@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Healthcare Assistant - All Screens (Merged)</title>
+    <!-- Backend API configuration meta tags -->
+    <meta name="api-origin" content="https://ai-tool-backend-4.onrender.com" />
+    <meta
+      name="backend-origin"
+      content="https://ai-tool-backend-4.onrender.com"
+    />
+    <!-- If deploying both on Render, replace with actual backend URL or leave empty to default to current origin -->
+    <meta name="api-prefix" content="" />
+    <meta name="api-key" content="REPLACE_WITH_SECURE_KEY" />
+    <meta name="api-timeout" content="60000" />
+    <meta name="api-retries" content="1" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --nav-bg: #1d335f;
+        --nav-active: #132744;
+        --brand: #284497;
+        --border: #d0d5dd;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: "Plus Jakarta Sans", Arial, sans-serif;
+        background: #fff;
+        color: #111;
+        -webkit-font-smoothing: antialiased;
+      }
+      header {
+        background: var(--brand);
+        color: #fff;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 24px;
+      }
+      header h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+      }
+      #envBadge {
+        margin-left: auto;
+        font-size: 12px;
+        opacity: 0.85;
+        letter-spacing: 0.5px;
+      }
+      nav {
+        background: var(--nav-bg);
+        display: flex;
+        flex-wrap: wrap;
+        padding: 0;
+      }
+      nav button {
+        background: transparent;
+        border: none;
+        color: #fff;
+        padding: 10px 18px;
+        font-size: 14px;
+        cursor: pointer;
+        position: relative;
+      }
+      nav button.active {
+        background: var(--nav-active);
+        font-weight: 600;
+      }
+      nav button:not(.active):hover {
+        background: #223d6e;
+      }
+      main {
+        padding: 0;
+        min-height: calc(100vh - 120px);
+      }
+      .screen-host {
+        display: none;
+        padding: 0;
+      }
+      .screen-host.active {
+        display: block;
+        animation: fade 0.25s ease;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .loader {
+        padding: 40px 30px;
+        font-size: 14px;
+        color: #444;
+      }
+      .small-note {
+        font-size: 11px;
+        color: #666;
+        margin: 8px 0 0;
+      }
+      footer {
+        background: #f5f5f5;
+        padding: 12px 20px;
+        font-size: 12px;
+        text-align: center;
+        color: #555;
+      }
+      .top-actions {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+      }
+      .pill {
+        background: #edf2ff;
+        color: #284497;
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 30px;
+        font-weight: 500;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .error-box {
+        background: #ffe6e6;
+        border: 1px solid #ffb5b5;
+        padding: 12px 16px;
+        border-radius: 8px;
+        font-size: 13px;
+        color: #8a1f1f;
+        margin: 16px;
+      }
+      .reload-btn {
+        background: #fff;
+        border: 1px solid var(--brand);
+        color: var(--brand);
+        padding: 6px 12px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .reload-btn:hover {
+        background: var(--brand);
+        color: #fff;
+      }
+      @media (max-width: 860px) {
+        nav button {
+          flex: 1 0 50%;
+          text-align: center;
+        }
+      }
+      @media (max-width: 520px) {
+        header {
+          flex-wrap: wrap;
+        }
+        #envBadge {
+          width: 100%;
+          text-align: right;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Healthcare Assistant Suite</h1>
+      <div class="pill">Merged Multi-Screen Single Page</div>
+      <div id="envBadge">ENV: <span id="envName">auto</span></div>
+    </header>
+    <nav id="mainNav"></nav>
+    <main id="screensContainer"></main>
+    <footer>
+      &copy; <span id="year"></span> Healthcare AI – All original screens
+      dynamically merged without iframes.
+    </footer>
+
+    <!-- Master API Client (already enhanced elsewhere) -->
+    <script src="/static/integration_api_client.js"></script>
+    <!-- Legacy integration scripts (will attach when their HTML loads and re-insert scripts) -->
+    <script src="/static/clinical_chat_integration.js" defer></script>
+    <script src="/static/document_analyzer_integration.js" defer></script>
+    <script src="/static/organ_analyzer_integration.js" defer></script>
+    <script src="/static/speech_to_text_integration.js" defer></script>
+    <script src="/static/text_to_speech_integration.js" defer></script>
+    <script src="/static/healthcare-api-client.js" defer></script>
+
+    <script>
+      // Dynamic override: if backend served on same origin, remove explicit origin meta.
+      (function () {
+        const assumedBackend = window.location.origin; // adjust if you want different ports locally
+        const metaOrigin = document.querySelector('meta[name="api-origin"]');
+        if (
+          metaOrigin &&
+          (metaOrigin.content === "" || metaOrigin.content === "AUTO")
+        ) {
+          metaOrigin.setAttribute("content", assumedBackend);
+        }
+        // Optionally expose globals for scripts that read window.*
+        window.API_ORIGIN = metaOrigin ? metaOrigin.content : assumedBackend;
+        window.API_PREFIX = "";
+        // Inject API key from localStorage if present (safer than hard-code)
+        const storedKey = localStorage.getItem("MASTER_API_KEY");
+        if (storedKey) {
+          const metaKey = document.querySelector('meta[name="api-key"]');
+          if (metaKey) metaKey.setAttribute("content", storedKey);
+          window.UNIFIED_API_KEY = storedKey;
+        }
+      })();
+      // Configuration of existing standalone pages to merge
+      const SCREENS = [
+        { id: "home", label: "Home", src: "index.html" },
+        { id: "homepage", label: "Homepage", src: "homepage_ai_tool.html" },
+        { id: "clinical", label: "Clinical Chat", src: "clinical_chat.html" },
+        {
+          id: "doccsv",
+          label: "Document / CSV",
+          src: "healthcare-assistant-document-analyzer.html",
+        },
+        { id: "organ", label: "Organ Analyzer", src: "organ-analyzer.html" },
+        { id: "speech", label: "Speech to Text", src: "speech-to-text.html" },
+        {
+          id: "tts",
+          label: "Text to Speech",
+          src: "healthcare-assistant-text-to-speech.html",
+        },
+      ];
+
+      const navEl = document.getElementById("mainNav");
+      const container = document.getElementById("screensContainer");
+      const yearEl = document.getElementById("year");
+      yearEl.textContent = new Date().getFullYear();
+
+      // Build nav
+      SCREENS.forEach((s, i) => {
+        const btn = document.createElement("button");
+        btn.textContent = s.label;
+        btn.dataset.id = s.id;
+        if (i === 0) btn.classList.add("active");
+        btn.addEventListener("click", () => activateScreen(s.id));
+        navEl.appendChild(btn);
+        // host container
+        const host = document.createElement("section");
+        host.id = "screen-" + s.id;
+        host.className = "screen-host" + (i === 0 ? " active" : "");
+        host.innerHTML = `<div class="loader" data-loader>Loading ${s.label}...</div>`;
+        container.appendChild(host);
+      });
+
+      async function activateScreen(id) {
+        [...navEl.querySelectorAll("button")].forEach((b) =>
+          b.classList.toggle("active", b.dataset.id === id)
+        );
+        [...container.children].forEach((ch) =>
+          ch.classList.toggle("active", ch.id === "screen-" + id)
+        );
+        const spec = SCREENS.find((s) => s.id === id);
+        if (!spec) return;
+        const host = document.getElementById("screen-" + id);
+        if (!host.dataset.loaded) {
+          await loadScreen(spec, host);
+        }
+        // Scroll to top of newly shown screen
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      async function loadScreen(spec, host) {
+        const loader = host.querySelector("[data-loader]");
+        try {
+          const res = await fetch(spec.src, { cache: "no-cache" });
+          if (!res.ok) throw new Error(`Fetch failed (${res.status})`);
+          const html = await res.text();
+          injectHTML(spec, host, html);
+          host.dataset.loaded = "1";
+        } catch (err) {
+          console.error("Load error", spec.src, err);
+          host.innerHTML = `<div class="error-box">Failed to load ${spec.label}: ${err.message} <button class='reload-btn' data-retry='${spec.id}'>Retry</button></div>`;
+          host.querySelector("[data-retry]")?.addEventListener("click", () => {
+            host.removeAttribute("data-loaded");
+            host.innerHTML = `<div class='loader' data-loader>Loading ${spec.label}...</div>`;
+            loadScreen(spec, host);
+          });
+        } finally {
+          if (loader) loader.remove();
+        }
+      }
+
+      function injectHTML(spec, host, raw) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(raw, "text/html");
+        // Extract <style> & <link rel="stylesheet"> from head
+        const styleEls = [
+          ...doc.head.querySelectorAll('style,link[rel="stylesheet"]'),
+        ];
+        styleEls.forEach((el) => {
+          // Avoid duplicates by signature
+          const signature =
+            el.tagName === "STYLE"
+              ? hashText(el.textContent)
+              : el.getAttribute("href");
+          if (
+            signature &&
+            document.head.querySelector(
+              `[data-merged-tag='${CSS.escape(signature)}']`
+            )
+          )
+            return;
+          const clone = el.cloneNode(true);
+          if (signature) clone.dataset.mergedTag = signature;
+          document.head.appendChild(clone);
+        });
+        // Body content
+        const bodyNodes = [...doc.body.childNodes];
+        const wrapper = document.createElement("div");
+        wrapper.className = "merged-screen-inner";
+        bodyNodes.forEach((n) =>
+          wrapper.appendChild(document.importNode(n, true))
+        );
+        host.appendChild(wrapper);
+        // Execute scripts (inline + external) preserving order
+        const scriptEls = [...doc.querySelectorAll("script")];
+        scriptEls.forEach((s) => {
+          const newScript = document.createElement("script");
+          // Copy attributes
+          [...s.attributes].forEach((a) =>
+            newScript.setAttribute(a.name, a.value)
+          );
+          if (s.textContent) newScript.textContent = s.textContent;
+          host.appendChild(newScript);
+        });
+        // Marker
+        host.dataset.source = spec.src;
+        // Add note banner
+        const note = document.createElement("div");
+        note.className = "small-note";
+        note.textContent = `Loaded original page: ${spec.src}`;
+        host.insertBefore(note, wrapper);
+      }
+
+      function hashText(str) {
+        let h = 0,
+          i,
+          ch;
+        if (!str) return "";
+        for (i = 0; i < str.length; i++) {
+          ch = str.charCodeAt(i);
+          h = (h << 5) - h + ch;
+          h |= 0;
+        }
+        return "h" + h.toString(16);
+      }
+
+      // Initial activation (loads first screen automatically)
+      activateScreen("home");
+
+      // Environment detection badge (simple heuristic)
+      const origin = window.location.origin;
+      let env = "local";
+      if (/localhost|127\.0\.0\.1/.test(origin)) env = "local";
+      else if (/staging|dev/i.test(origin)) env = "staging";
+      else env = "prod";
+      document.getElementById("envName").textContent = env;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debug - Three Screens Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      .section {
+        margin: 30px 0;
+        padding: 20px;
+        border: 1px solid #ccc;
+      }
+      .result {
+        margin: 10px 0;
+        padding: 10px;
+        background: #f5f5f5;
+      }
+      .error {
+        background: #ffe6e6;
+        color: #d8000c;
+      }
+      .success {
+        background: #d4edda;
+        color: #155724;
+      }
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        cursor: pointer;
+      }
+      input,
+      select {
+        padding: 8px;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Debug Test - Three Problematic Screens</h1>
+
+    <!-- Text-to-Speech Test -->
+    <div class="section">
+      <h2>1. Text-to-Speech Test</h2>
+      <input
+        type="text"
+        id="textInput"
+        placeholder="Enter text to translate"
+        value="Hello world"
+      />
+      <select id="languageSelect">
+        <option value="Spanish">Spanish</option>
+        <option value="French">French</option>
+        <option value="German">German</option>
+        <option value="Italian">Italian</option>
+        <option value="Portuguese">Portuguese</option>
+        <option value="Russian">Russian</option>
+        <option value="Chinese">Chinese</option>
+        <option value="Japanese">Japanese</option>
+      </select>
+      <button onclick="testTextToSpeech()">Test Translation + TTS</button>
+      <div id="ttsResult" class="result"></div>
+      <audio id="ttsAudio" controls style="display: none"></audio>
+    </div>
+
+    <!-- Speech-to-Text Test -->
+    <div class="section">
+      <h2>2. Speech-to-Text Test</h2>
+      <input type="file" id="audioFile" accept="audio/*" />
+      <select id="outputLanguage">
+        <option value="en">English</option>
+        <option value="es">Spanish</option>
+        <option value="fr">French</option>
+        <option value="de">German</option>
+        <option value="it">Italian</option>
+        <option value="pt">Portuguese</option>
+        <option value="ru">Russian</option>
+        <option value="zh">Chinese</option>
+        <option value="ja">Japanese</option>
+      </select>
+      <button onclick="testSpeechToText()">Test Transcription</button>
+      <div id="sttResult" class="result"></div>
+    </div>
+
+    <!-- Organ Analyzer Test -->
+    <div class="section">
+      <h2>3. Organ Analyzer Test</h2>
+      <input type="file" id="imageFile" accept="image/*" />
+      <select id="organType">
+        <option value="heart">Heart</option>
+        <option value="brain">Brain</option>
+        <option value="lung">Lung</option>
+        <option value="liver">Liver</option>
+        <option value="kidney">Kidney</option>
+      </select>
+      <button onclick="testOrganAnalyzer()">Test Organ Analysis</button>
+      <div id="organResult" class="result"></div>
+    </div>
+
+    <script>
+      const API_BASE_URL = "http://localhost:5001/api";
+
+      function showResult(elementId, message, isError = false) {
+        const element = document.getElementById(elementId);
+        element.innerHTML = message;
+        element.className = isError ? "result error" : "result success";
+      }
+
+      async function testTextToSpeech() {
+        const text = document.getElementById("textInput").value;
+        const language = document.getElementById("languageSelect").value;
+        const resultDiv = document.getElementById("ttsResult");
+
+        if (!text.trim()) {
+          showResult("ttsResult", "Please enter some text", true);
+          return;
+        }
+
+        showResult("ttsResult", "Testing translation...");
+
+        try {
+          // Step 1: Translate text
+          const translationResponse = await fetch(`${API_BASE_URL}/translate`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              text: text,
+              targetLanguage: language,
+            }),
+          });
+
+          if (!translationResponse.ok) {
+            throw new Error(
+              `Translation API error: ${translationResponse.status}`
+            );
+          }
+
+          const translationData = await translationResponse.json();
+          console.log("Translation response:", translationData);
+
+          if (!translationData.success) {
+            throw new Error(
+              translationData.error?.message || "Translation failed"
+            );
+          }
+
+          const translatedText = translationData.data.translatedText;
+          showResult(
+            "ttsResult",
+            `✓ Translation: "${translatedText}". Testing TTS...`
+          );
+
+          // Step 2: Generate audio
+          const ttsResponse = await fetch(
+            `${API_BASE_URL}/translation/text-to-speech`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                text: translatedText,
+                language: language,
+              }),
+            }
+          );
+
+          if (!ttsResponse.ok) {
+            throw new Error(`TTS API error: ${ttsResponse.status}`);
+          }
+
+          const ttsData = await ttsResponse.json();
+          console.log("TTS response:", ttsData);
+
+          if (!ttsData.success) {
+            throw new Error(ttsData.error?.message || "TTS failed");
+          }
+
+          // Play audio
+          const audioElement = document.getElementById("ttsAudio");
+          audioElement.src = `data:audio/mp3;base64,${ttsData.data.audioBase64}`;
+          audioElement.style.display = "block";
+
+          showResult(
+            "ttsResult",
+            `✅ SUCCESS: Translation: "${translatedText}" - Audio generated and ready to play!`
+          );
+        } catch (error) {
+          console.error("Text-to-Speech test error:", error);
+          showResult("ttsResult", `❌ ERROR: ${error.message}`, true);
+        }
+      }
+
+      async function testSpeechToText() {
+        const fileInput = document.getElementById("audioFile");
+        const outputLanguage = document.getElementById("outputLanguage").value;
+
+        if (!fileInput.files[0]) {
+          showResult("sttResult", "Please select an audio file", true);
+          return;
+        }
+
+        const file = fileInput.files[0];
+        showResult("sttResult", `Testing transcription of ${file.name}...`);
+
+        try {
+          const formData = new FormData();
+          formData.append("audio", file);
+          formData.append("outputLanguage", outputLanguage);
+
+          const response = await fetch(`${API_BASE_URL}/transcription`, {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!response.ok) {
+            throw new Error(`Transcription API error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Transcription response:", data);
+
+          if (!data.success) {
+            throw new Error(data.error?.message || "Transcription failed");
+          }
+
+          const transcription =
+            data.data?.transcription || data.data?.text || "No text returned";
+          showResult(
+            "sttResult",
+            `✅ SUCCESS: Transcription: "${transcription}"`
+          );
+        } catch (error) {
+          console.error("Speech-to-Text test error:", error);
+          showResult("sttResult", `❌ ERROR: ${error.message}`, true);
+        }
+      }
+
+      async function testOrganAnalyzer() {
+        const fileInput = document.getElementById("imageFile");
+        const organType = document.getElementById("organType").value;
+
+        if (!fileInput.files[0]) {
+          showResult("organResult", "Please select an image file", true);
+          return;
+        }
+
+        const file = fileInput.files[0];
+        showResult("organResult", `Testing organ analysis of ${file.name}...`);
+
+        try {
+          const formData = new FormData();
+          formData.append("image", file);
+          formData.append("organType", organType);
+
+          const response = await fetch(
+            `${API_BASE_URL}/organ-analyzer/analyze`,
+            {
+              method: "POST",
+              body: formData,
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error(`Organ Analyzer API error: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Organ Analyzer response:", data);
+
+          if (!data.success) {
+            throw new Error(data.error?.message || "Organ analysis failed");
+          }
+
+          const analysis =
+            data.data?.analysis || data.analysis || "Analysis completed";
+          showResult("organResult", `✅ SUCCESS: Analysis: "${analysis}"`);
+        } catch (error) {
+          console.error("Organ Analyzer test error:", error);
+          showResult("organResult", `❌ ERROR: ${error.message}`, true);
+        }
+      }
+
+      // Add some basic error handling for fetch
+      window.addEventListener("unhandledrejection", function (event) {
+        console.error("Unhandled promise rejection:", event.reason);
+      });
+    </script>
+  </body>
+</html>

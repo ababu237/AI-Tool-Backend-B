@@ -1,0 +1,20 @@
+# backend_api specific dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.29.0
+gtts==2.5.1
+deep-translator==1.11.4
+langdetect==1.0.9
+openai==1.3.5
+PyPDF2==3.0.1
+pandas==2.1.3
+faiss-cpu==1.7.4
+langchain-community==0.0.21
+langchain-core==0.1.21
+# torch/torchvision optional; comment out if not needed
+# torch==2.1.0
+# torchvision==0.16.0
+
+# Notes:
+# - openai version pinned for compatibility with existing code using ChatCompletion & Audio APIs.
+# - LangChain imports in document_api still use deprecated callbacks; consider refactor.
+# - Remove faiss-cpu if vector search not required.

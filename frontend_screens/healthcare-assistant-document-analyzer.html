@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Healthcare Assistant - Velocity Clinical Research</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --brand-blue: #284497;
+        --light-blue-bg: #e2e9ff;
+        --light-blue-chip: #edf2ff;
+        --border-color: #bababa;
+        --text-primary: #111111;
+        --text-secondary: rgba(0, 0, 0, 0.5);
+        --text-light: rgba(17, 17, 17, 0.5);
+        --white: #ffffff;
+        --black: #000000;
+        --light-gray-bg: #f6f6f6;
+        --gray-border: #c7c7c7;
+        --scrollbar-track: #f2f2f2;
+        --scrollbar-thumb: #d9d9d9;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        background-color: var(--white);
+        color: var(--text-primary);
+      }
+
+      .page-container {
+        max-width: 1920px;
+        margin: 0 auto;
+        padding: 0 100px;
+        box-sizing: border-box;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      @media (max-width: 1200px) {
+        .page-container {
+          padding: 0 40px;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .page-container {
+          padding: 0 20px;
+        }
+      }
+
+      .site-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 60px;
+        padding-bottom: 20px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+      }
+
+      .logo img {
+        width: 120px;
+        height: auto;
+      }
+
+      .page-title {
+        color: var(--brand-blue);
+        font-size: 30px;
+        font-weight: 400;
+        margin: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      .user-profile {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+      }
+
+      .user-details {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        font-size: 14px;
+        line-height: 1.2;
+      }
+
+      .welcome-text {
+        font-size: 12px;
+        color: var(--text-secondary);
+      }
+
+      .user-name {
+        color: var(--black);
+      }
+
+      .user-avatar {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .user-avatar .avatar-bg,
+      .user-avatar .avatar-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      .user-avatar .avatar-bg {
+        width: 60px;
+        height: 60px;
+      }
+
+      .user-avatar .avatar-inner {
+        width: 52px;
+        height: 52px;
+      }
+
+      .user-initials {
+        position: relative;
+        z-index: 1;
+        font-size: 14px;
+        font-weight: 400;
+        color: var(--black);
+      }
+
+      @media (max-width: 992px) {
+        .page-title {
+          display: none;
+        }
+        .site-header {
+          justify-content: space-between;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .user-details {
+          display: none;
+        }
+      }
+
+      .main-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 70px;
+        padding: 70px 0;
+      }
+
+      .document-viewer,
+      .input-section {
+        width: 100%;
+        max-width: 1100px;
+      }
+
+      .document-header {
+        margin-bottom: 24px;
+      }
+
+      .document-title {
+        font-size: 30px;
+        font-weight: 800;
+        color: var(--black);
+        margin: 0 0 19px 0;
+      }
+
+      .file-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .file-icon {
+        position: relative;
+        width: 26px;
+        height: 31px;
+      }
+
+      .file-name {
+        font-size: 18px;
+        color: rgba(0, 0, 0, 0.7);
+        margin: 0;
+      }
+
+      .summary-prompt {
+        background-color: var(--light-blue-chip);
+        border-radius: 10px;
+        padding: 15px 24px;
+        font-size: 18px;
+        color: var(--black);
+        max-width: 400px;
+        margin-left: auto;
+        margin-bottom: 27px;
+      }
+
+      .content-area {
+        display: flex;
+        gap: 20px;
+      }
+
+      .text-scroll-container {
+        flex-grow: 1;
+        height: 192px;
+        overflow-y: scroll;
+        padding-right: 15px; /* space for custom scrollbar */
+      }
+
+      .text-scroll-container::-webkit-scrollbar {
+        display: none; /* Hide default scrollbar */
+      }
+
+      .document-text {
+        font-size: 16px;
+        line-height: 26px;
+        color: var(--black);
+        text-align: justify;
+        margin: 0;
+      }
+
+      .custom-scrollbar {
+        width: 10px;
+        height: 192px;
+        background-color: var(--scrollbar-track);
+        border-radius: 50px;
+        position: relative;
+      }
+
+      .scrollbar-thumb {
+        width: 10px;
+        height: 47%; /* 218/459 */
+        background-color: var(--scrollbar-thumb);
+        border-radius: 50px;
+        position: absolute;
+        top: 0;
+      }
+
+      .divider {
+        border: none;
+        border-top: 1px solid #c8c8c8;
+        margin: 13px 0 16px 0;
+      }
+
+      .audio-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .generate-audio {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+      }
+
+      .audio-player {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background-color: #efefef;
+        border-radius: 45px;
+        padding: 10px 20px;
+        width: 100%;
+        max-width: 431px;
+        box-sizing: border-box;
+      }
+
+      .play-button {
+        width: 19px;
+        height: 19px;
+        background-color: var(--black);
+        border: none;
+        clip-path: polygon(0 0, 100% 50%, 0 100%);
+        cursor: pointer;
+      }
+
+      .time-display {
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.6);
+        white-space: nowrap;
+      }
+
+      .progress-bar-container {
+        flex-grow: 1;
+        height: 5px;
+        position: relative;
+      }
+
+      .progress-bar-track {
+        width: 100%;
+        height: 100%;
+        background-color: #cccccc;
+        border-radius: 40px;
+      }
+
+      .progress-bar-filled {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 77%; /* 143/185 */
+        height: 100%;
+        background-color: #676767;
+        border-radius: 40px;
+      }
+
+      .volume-icon {
+        width: 23px;
+        height: 18px;
+      }
+
+      .menu-dots {
+        display: flex;
+        flex-direction: column;
+        gap: 2.12px;
+      }
+
+      .menu-dots span {
+        width: 4.25px;
+        height: 4.25px;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .input-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .input-container {
+        position: relative;
+        width: 100%;
+        height: 150px;
+        border: 1px solid #7f94d3;
+        border-radius: 20px;
+        padding: 15px 20px;
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .input-container textarea {
+        flex-grow: 1;
+        border: none;
+        outline: none;
+        background: transparent;
+        resize: none;
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 18px;
+        color: var(--text-secondary);
+      }
+
+      .input-container textarea::placeholder {
+        color: var(--text-secondary);
+      }
+
+      .input-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: auto;
+      }
+
+      .language-selector {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background-color: var(--light-gray-bg);
+        border: 1px solid var(--gray-border);
+        border-radius: 8px;
+        padding: 9px 12px;
+        cursor: pointer;
+      }
+
+      .language-selector span {
+        font-size: 12px;
+        color: var(--text-light);
+      }
+
+      .language-selector img {
+        width: 15px;
+      }
+
+      .icon-button {
+        background: none;
+        border: none;
+        padding: 0;
+        cursor: pointer;
+        margin-left: auto;
+      }
+      .icon-button:not(.send-button) {
+        margin-left: 0;
+      }
+      .send-button {
+        margin-left: 5px;
+      }
+
+      .icon-button img {
+        width: 35px;
+        height: 35px;
+      }
+
+      /* Standardized Navigation */
+      .standard-nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 20px;
+        padding: 15px;
+        background: linear-gradient(145deg, #f8f9fa, #ffffff);
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
+      }
+
+      .nav-btn {
+        font-family: "Plus Jakarta Sans", sans-serif;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--text-primary);
+        background: linear-gradient(145deg, #ffffff, #f8f9fa);
+        border: 2px solid #dee2e6;
+        border-radius: 25px;
+        padding: 10px 20px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        min-width: 120px;
+        justify-content: center;
+      }
+
+      .nav-btn:hover {
+        background: linear-gradient(145deg, #e3f2fd, #bbdefb);
+        border-color: var(--brand-blue);
+        color: var(--brand-blue);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(40, 68, 151, 0.2);
+      }
+
+      .nav-btn.active {
+        background: linear-gradient(145deg, var(--brand-blue), #1e3470);
+        border-color: var(--brand-blue);
+        color: #ffffff;
+        font-weight: 600;
+      }
+
+      .nav-btn.active:hover {
+        background: linear-gradient(145deg, #1e3470, var(--brand-blue));
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 768px) {
+        .summary-prompt {
+          margin-left: 0;
+          max-width: 100%;
+        }
+        .content-area {
+          flex-direction: column;
+        }
+        .custom-scrollbar {
+          display: none;
+        }
+        .text-scroll-container {
+          padding-right: 0;
+          overflow-y: visible;
+          height: auto;
+        }
+        .audio-player {
+          flex-wrap: wrap;
+          max-width: 100%;
+        }
+        .input-actions {
+          flex-wrap: wrap;
+        }
+      }
+
+      #section-footer {
+        position: relative;
+        z-index: -1; /* Place it behind main content if needed */
+      }
+
+      .footer-bg-wrapper {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 358px; /* Max height of graphics */
+        overflow: hidden;
+        z-index: -1;
+      }
+
+      .bg-graphic {
+        position: absolute;
+        bottom: 0;
+        width: 656px;
+        height: 358px;
+      }
+
+      .bg-left {
+        left: 0;
+        transform: scaleX(-1); /* Flipped in design */
+      }
+
+      .bg-right {
+        right: 0;
+      }
+
+      .bg-graphic img {
+        mix-blend-mode: normal; /* Adjust blend mode if needed */
+      }
+
+      .site-footer {
+        padding-top: 30px;
+        padding-bottom: 30px;
+        text-align: center;
+      }
+
+      .api-key {
+        font-size: 12px;
+        color: #bcbcbc;
+        margin: 0 0 50px 0;
+      }
+
+      .api-key span {
+        color: #bcbcbc;
+      }
+
+      .copyright {
+        font-size: 14px;
+        color: var(--text-light);
+        margin: 0;
+      }
+
+      @media (max-width: 1919px) {
+        .footer-bg-wrapper {
+          display: none; /* Hide complex background on smaller screens for simplicity */
+        }
+      }
+
+      /* Footer background graphics */
+      .bg-graphic svg:first-child {
+        position: absolute;
+        top: 8.26px;
+        left: 0px;
+        width: 655.43px;
+        height: 357.51px;
+        opacity: 0.35;
+      }
+
+      .bg-graphic svg:nth-child(2) {
+        position: absolute;
+        top: 8.25px;
+        left: 0px;
+        width: 509.91px;
+        height: 315.54px;
+      }
+
+      .bg-graphic svg:nth-child(3) {
+        position: absolute;
+        top: 26.73px;
+        left: 179.36px;
+        width: 333.08px;
+        height: 277.64px;
+      }
+
+      .bg-right svg:first-child {
+        position: absolute;
+        top: 6.98px;
+        left: 0px;
+        width: 597.45px;
+        height: 325.88px;
+        opacity: 0.35;
+      }
+
+      .bg-right svg:nth-child(2) {
+        position: absolute;
+        top: 6.97px;
+        left: 132.65px;
+        width: 464.8px;
+        height: 287.62px;
+      }
+
+      .bg-right svg:nth-child(3) {
+        position: absolute;
+        top: 23.82px;
+        left: 130.34px;
+        width: 303.62px;
+        height: 253.08px;
+      }
+    </style>
+  </head>
+  <body>
+    <section id="section-header">
+      <div class="page-container">
+        <header class="site-header">
+          <a
+            href="homepage_ai_tool.html"
+            class="logo"
+            title="Velocity Clinical Research"
+          >
+            <div
+              data-layer="Group 202"
+              class="Group202"
+              style="width: 120px; height: 53.71px; position: relative"
+            >
+              <div
+                data-svg-wrapper
+                data-layer="Vector"
+                class="Vector"
+                style="left: 44.66px; top: 45.68px; position: absolute"
+              >
+                <svg
+                  width="9"
+                  height="9"
+                  viewBox="0 0 9 9"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4.5486 8.70595C6.69756 8.70595 8.43972 6.90937 8.43972 4.6933C8.43972 2.47747 6.69756 0.680901 4.5486 0.680901C2.39964 0.680901 0.657715 2.47747 0.657715 4.6933C0.657715 6.90937 2.39964 8.70595 4.5486 8.70595Z"
+                    fill="#35C1D8"
+                  />
+                </svg>
+              </div>
+              <div
+                data-svg-wrapper
+                data-layer="Vector"
+                class="Vector"
+                style="left: 56.11px; top: 45.68px; position: absolute"
+              >
+                <svg
+                  width="8"
+                  height="9"
+                  viewBox="0 0 8 9"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M3.99708 8.70595C6.14604 8.70595 7.88797 6.90937 7.88797 4.6933C7.88797 2.47747 6.14604 0.680901 3.99708 0.680901C1.84812 0.680901 0.105957 2.47747 0.105957 4.6933C0.105957 6.90937 1.84812 8.70595 3.99708 8.70595Z"
+                    fill="#35BC4E"
+                  />
+                </svg>
+              </div>
+              <div
+                data-svg-wrapper
+                data-layer="Vector"
+                class="Vector"
+                style="left: 67.55px; top: 45.68px; position: absolute"
+              >
+                <svg
+                  width="9"
+                  height="9"
+                  viewBox="0 0 9 9"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M4.44581 8.70595C6.59478 8.70595 8.3367 6.90937 8.3367 4.6933C8.3367 2.47747 6.59478 0.680901 4.44581 0.680901C2.29685 0.680901 0.554688 2.47747 0.554688 4.6933C0.554688 6.90937 2.29685 8.70595 4.44581 8.70595Z"
+                    fill="#E84242"
+                  />
+                </svg>
+              </div>
+              <div
+                data-svg-wrapper
+                data-layer="Vector"
+                class="Vector"
+                style="left: 0px; top: 0px; position: absolute"
+              >
+                <svg
+                  width="120"
+                  height="38"
+                  viewBox="0 0 120 38"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M0 1.67521H3.75756L10.8008 21.7876H10.8685L18.1786 1.67521H21.737L12.2899 26.4043H9.24401L0 1.67521ZM23.4311 19.2748C23.4225 19.9611 23.5793 20.6389 23.8874 21.2472C24.185 21.831 24.5935 22.3471 25.0884 22.7649C25.6034 23.194 26.1881 23.5256 26.8154 23.744C27.4694 23.9758 28.1563 24.0938 28.848 24.093C29.7214 24.1167 30.583 23.8799 31.3291 23.411C32.0647 22.9261 32.7182 22.3197 33.263 21.6161L35.5644 23.4309C33.8729 25.691 31.5031 26.8214 28.4554 26.8214C27.2786 26.8382 26.1103 26.613 25.0188 26.1591C24.0322 25.7465 23.1427 25.1208 22.41 24.3244C21.689 23.5278 21.1306 22.5898 20.7681 21.5663C20.3759 20.4655 20.1794 19.3008 20.1879 18.1281C20.1765 16.9502 20.3894 15.7814 20.8145 14.688C21.2103 13.6613 21.797 12.7244 22.5414 11.9299C23.2862 11.1421 24.1783 10.5186 25.1638 10.0971C26.2152 9.64721 27.3442 9.4213 28.4825 9.433C29.9006 9.433 31.1028 9.68894 32.0892 10.2008C33.0293 10.6788 33.8561 11.3645 34.5103 12.2091C35.1418 13.0372 35.6076 13.9862 35.8814 15.0011C36.1591 16.0255 36.299 17.0844 36.2971 18.1481V19.2669L23.4311 19.2748ZM33.0463 16.7521C33.0314 16.0989 32.9227 15.4517 32.7235 14.8316C32.5421 14.2684 32.2481 13.7508 31.861 13.3119C31.4594 12.8696 30.9682 12.5244 30.4222 12.3008C29.7802 12.0434 29.0954 11.9187 28.4069 11.9338C27.7018 11.9254 27.0031 12.0744 26.359 12.3706C25.7676 12.6394 25.2326 13.0249 24.7848 13.5053C24.3641 13.9599 24.0259 14.4889 23.7869 15.0669C23.5589 15.598 23.4378 16.1713 23.4311 16.7521H33.0463ZM40.1902 0H43.2379V26.3964H40.1902V0ZM46.8254 18.1221C46.8161 16.957 47.0412 15.8026 47.4866 14.7318C47.915 13.702 48.5302 12.7659 49.2989 11.9737C50.9129 10.3297 53.0899 9.40778 55.3586 9.40778C57.6274 9.40778 59.8044 10.3297 61.4184 11.9737C62.1902 12.7658 62.8078 13.7026 63.2383 14.7338C63.6838 15.8046 63.9089 16.959 63.8998 18.1241C63.9055 19.2693 63.6898 20.4042 63.2652 21.4623C62.8404 22.5205 62.2152 23.4806 61.4263 24.2865C60.6458 25.075 59.7271 25.7032 58.7189 26.1373C56.5704 27.0439 54.1625 27.0439 52.014 26.1373C51.0055 25.7037 50.0866 25.0755 49.3066 24.2865C48.5174 23.4806 47.8925 22.5205 47.4677 21.4623C47.0429 20.4042 46.8271 19.2693 46.8331 18.1241L46.8254 18.1221ZM50.0762 18.1221C50.0683 18.9125 50.1946 19.6981 50.4494 20.4435C50.6755 21.1167 51.0329 21.735 51.4997 22.2603C51.9655 22.7719 52.531 23.1762 53.1588 23.4469C54.5717 24.0293 56.1475 24.0293 57.5604 23.4469C58.1873 23.1755 58.752 22.7712 59.2178 22.2603C59.6844 21.735 60.0418 21.1167 60.2678 20.4435C60.7654 18.9378 60.7654 17.3045 60.2678 15.7988C60.0413 15.1264 59.6839 14.5088 59.2178 13.984C58.753 13.4695 58.1882 13.0617 57.5604 12.7874C56.1475 12.205 54.5717 12.205 53.1588 12.7874C52.53 13.061 51.9646 13.4688 51.4997 13.984C51.0334 14.5088 50.676 15.1264 50.4494 15.7988C50.1946 16.5449 50.0683 17.3312 50.0762 18.1221ZM78.6533 14.2452C78.1435 13.6823 77.5421 13.2159 76.8761 12.8672C76.1818 12.5359 75.4226 12.3742 74.658 12.3945C73.9046 12.3764 73.1573 12.5381 72.4745 12.8672C71.8663 13.1697 71.333 13.6117 70.9159 14.1595C70.4902 14.7222 70.169 15.3611 69.9682 16.0441C69.7529 16.7622 69.6444 17.51 69.6473 18.2617C69.6432 19.0061 69.769 19.7451 70.0186 20.4435C70.2545 21.1054 70.6109 21.7146 71.0686 22.2384C71.5238 22.75 72.0778 23.1576 72.695 23.4349C73.3661 23.7341 74.0914 23.8829 74.8224 23.8717C75.5815 23.8931 76.3354 23.7313 77.0232 23.399C77.6678 23.0561 78.2424 22.5882 78.7152 22.021L80.8831 24.2546C80.1372 25.1357 79.1911 25.8118 78.1294 26.2229C77.0602 26.6231 75.9307 26.8258 74.7934 26.8214C73.6303 26.836 72.4754 26.6226 71.3897 26.193C70.3973 25.797 69.4934 25.197 68.7324 24.4301C67.9769 23.6578 67.3884 22.7294 67.0056 21.7059C66.5887 20.5869 66.3821 19.3965 66.3962 18.1979C66.383 16.993 66.5897 15.7962 67.0056 14.67C67.3805 13.6372 67.962 12.6973 68.7122 11.9115C69.4627 11.1257 70.3649 10.5116 71.3606 10.1091C72.4546 9.66535 73.6219 9.44587 74.7972 9.46292C75.9494 9.45869 77.0923 9.67787 78.1661 10.1091C79.2326 10.5355 80.189 11.2105 80.9604 12.0814L78.6533 14.2452ZM83.6311 3.9108C83.6275 3.60809 83.6842 3.30781 83.7977 3.02858C83.911 2.74933 84.079 2.49708 84.2906 2.28745C84.4958 2.07158 84.7409 1.90009 85.0111 1.78302C85.2814 1.66596 85.5718 1.60566 85.8648 1.60566C86.1581 1.60566 86.4482 1.66596 86.7185 1.78302C86.989 1.90009 87.2338 2.07158 87.439 2.28745C87.6511 2.49691 87.8194 2.74908 87.9331 3.02833C88.0469 3.30758 88.1038 3.60794 88.1004 3.9108C88.1035 4.21364 88.0466 4.51395 87.9329 4.79315C87.8191 5.07235 87.6511 5.32455 87.439 5.53415C87.2338 5.75004 86.989 5.92153 86.7185 6.0386C86.4482 6.15566 86.1581 6.21595 85.8648 6.21595C85.5718 6.21595 85.2814 6.15566 85.0111 6.0386C84.7409 5.92153 84.4958 5.75004 84.2906 5.53415C84.079 5.32445 83.9112 5.0722 83.7977 4.79298C83.6844 4.51375 83.6278 4.21352 83.6311 3.9108ZM84.341 9.84582H87.3888V26.3984H84.341V9.84582ZM101.473 12.564H97.1066V20.0706C97.1066 20.5372 97.1182 20.9959 97.1395 21.4506C97.1556 21.8703 97.2418 22.2838 97.3946 22.6731C97.5331 23.0254 97.7683 23.3284 98.0717 23.5446C98.3753 23.766 98.8219 23.8777 99.408 23.8777C99.7829 23.876 100.157 23.8407 100.526 23.772C100.895 23.7076 101.25 23.5773 101.576 23.3871V26.2509C101.137 26.485 100.661 26.633 100.17 26.6877C99.7274 26.7578 99.281 26.7983 98.8334 26.8092C97.6603 26.8092 96.7514 26.6404 96.1068 26.3026C95.5205 26.0172 95.0268 25.5628 94.6853 24.9946C94.3764 24.4457 94.1914 23.8323 94.1438 23.1996C94.0872 22.5349 94.0586 21.8654 94.0586 21.1914V12.564H90.5371V9.84582H94.0586V5.2031H97.1066V9.84582H101.473V12.564ZM103.85 9.84582H107.372L112.123 22.7649H112.191L116.749 9.84582H120L112.377 29.9584C112.128 30.6298 111.846 31.2882 111.534 31.9307C111.264 32.4907 110.911 33.0036 110.487 33.4503C110.07 33.878 109.571 34.2108 109.021 34.4274C108.346 34.6781 107.631 34.7964 106.913 34.7764C106.457 34.7756 106.001 34.7464 105.548 34.6888C105.09 34.6318 104.642 34.5088 104.218 34.3237L104.587 31.4599C105.162 31.7089 105.779 31.8391 106.403 31.8428C106.81 31.8512 107.214 31.7836 107.598 31.6436C107.914 31.522 108.201 31.3315 108.439 31.085C108.675 30.8333 108.871 30.5444 109.019 30.2294C109.193 29.8648 109.351 29.4923 109.491 29.1127L110.478 26.4942L103.85 9.84582ZM14.3108 32.9318C14.1834 32.7721 14.0219 32.6452 13.8389 32.5608C13.6342 32.4717 13.4134 32.4281 13.1911 32.4331C12.9566 32.4306 12.7244 32.4801 12.5104 32.5788C12.3048 32.6722 12.1199 32.8078 11.9669 32.9776C11.8073 33.1637 11.6839 33.3797 11.6034 33.6139C11.4306 34.1225 11.4306 34.6766 11.6034 35.1852C11.6833 35.4132 11.804 35.6235 11.9592 35.8055C12.1064 35.9787 12.2868 36.1188 12.4891 36.2163C12.6953 36.3141 12.9197 36.3638 13.1466 36.3618C13.3933 36.3665 13.6373 36.3076 13.8564 36.1906C14.0628 36.0757 14.2383 35.9099 14.3669 35.7077L15.4537 36.5435C15.2137 36.8952 14.8836 37.1714 14.5003 37.3412C14.126 37.5109 13.7218 37.5991 13.3129 37.6003C12.8772 37.6047 12.4442 37.5283 12.0346 37.3751C11.6587 37.236 11.3144 37.0187 11.0232 36.7368C10.7345 36.4514 10.5078 36.1062 10.3579 35.7238C10.0408 34.8692 10.0408 33.924 10.3579 33.0694C10.5083 32.6877 10.735 32.3432 11.0232 32.0584C11.3141 31.775 11.6584 31.5564 12.0346 31.4161C12.4442 31.2627 12.8772 31.1864 13.3129 31.1906C13.488 31.1914 13.6626 31.2075 13.8351 31.2387C14.0181 31.2706 14.1975 31.3213 14.3708 31.3901C14.5496 31.4594 14.7192 31.552 14.8755 31.6653C15.0404 31.7829 15.1872 31.9255 15.3106 32.0881L14.3108 32.9318ZM16.5386 31.3463H17.8421V36.2064H20.2575V37.4488H16.5386V31.3463ZM21.2864 31.3463H22.5898V37.4488H21.2864V31.3463ZM24.102 31.3463H25.8734L28.3877 35.5862H28.405V31.3463H29.7084V37.4488H28.0046L25.423 33.1053H25.4076V37.4488H24.102V31.3463ZM31.2228 31.3463H32.5262V37.4488H31.2228V31.3463ZM37.9044 32.9318C37.7758 32.7726 37.6138 32.6457 37.4304 32.5608C37.2264 32.4717 37.0063 32.4281 36.7846 32.4331C36.5496 32.4306 36.3166 32.4801 36.102 32.5788C35.8966 32.6727 35.7118 32.8083 35.5584 32.9776C35.4012 33.1607 35.2798 33.3733 35.2008 33.6037C35.028 34.1126 35.028 34.6667 35.2008 35.1753C35.2793 35.4035 35.3993 35.6139 35.5546 35.7956C35.7022 35.9693 35.8834 36.1091 36.0864 36.2064C36.2918 36.3044 36.5158 36.3541 36.7421 36.3519C36.9888 36.3566 37.2329 36.2977 37.4518 36.1804C37.6582 36.0658 37.8336 35.9 37.9622 35.6978L39.0492 36.5333C38.8092 36.8853 38.479 37.1615 38.0957 37.3313C37.7215 37.501 37.3174 37.5894 36.9084 37.5904C36.4726 37.5948 36.0396 37.5184 35.6302 37.3652C35.2538 37.2248 34.9094 37.0063 34.6186 36.7229C34.3298 36.4378 34.1038 36.0925 33.9552 35.7099C33.6382 34.8553 33.6382 33.9099 33.9552 33.0553C34.1042 32.6736 34.3303 32.3289 34.6186 32.0443C34.9094 31.7611 35.2538 31.5423 35.6302 31.4023C36.0396 31.2488 36.4726 31.1726 36.9084 31.1768C37.0834 31.1773 37.2581 31.1934 37.4304 31.2246C37.6135 31.2567 37.793 31.3075 37.9661 31.3763C38.1451 31.4456 38.3146 31.5381 38.471 31.6515C38.6359 31.7688 38.7826 31.9114 38.9062 32.0742L37.9044 32.9318ZM42.0389 31.3463H43.1258L45.6998 37.4488H44.2301L43.7059 36.1566H41.4106L40.9174 37.4488H39.4805L42.0389 31.3463ZM42.5398 33.1211L41.8205 35.0177H43.267L42.5398 33.1211ZM46.6591 31.3463H47.9606V36.2064H50.3779V37.4488H46.6591V31.3463ZM54.2225 31.3463H56.5142C56.802 31.3451 57.0893 31.375 57.3708 31.4359C57.6238 31.4901 57.8647 31.5928 58.0807 31.7391C58.2866 31.8826 58.453 32.0784 58.5641 32.3076C58.6922 32.5855 58.7539 32.8912 58.7438 33.1991C58.7554 33.5921 58.6411 33.9782 58.4191 34.298C58.1858 34.61 57.8438 34.816 57.4656 34.8721L58.9702 37.4488H57.4075L56.1698 35.0098H55.5278V37.4488H54.2225V31.3463ZM55.5278 33.871H56.3014C56.4194 33.871 56.5433 33.871 56.6746 33.8591C56.796 33.853 56.9155 33.8267 57.0286 33.7814C57.132 33.7403 57.2227 33.6713 57.2916 33.582C57.3672 33.4686 57.4042 33.3325 57.396 33.1951C57.4022 33.0647 57.3706 32.9355 57.305 32.8241C57.2455 32.7345 57.1651 32.6618 57.071 32.6128C56.9681 32.5618 56.8577 32.5281 56.7444 32.513C56.6251 32.4972 56.5049 32.4893 56.3846 32.489H55.5336L55.5278 33.871ZM60.0144 31.3463H64.0351V32.5868H61.3178V33.7255H63.8842V34.966H61.3178V36.2064H64.1858V37.4488H60.0144V31.3463ZM68.4811 32.838C68.3688 32.6952 68.219 32.5887 68.0498 32.5308C67.8857 32.4687 67.7124 32.4356 67.5374 32.4331C67.4383 32.4331 67.3399 32.4442 67.2434 32.467C67.1448 32.489 67.0498 32.5251 66.961 32.5749C66.8736 32.6219 66.7985 32.6905 66.7426 32.7741C66.672 32.8872 66.6451 33.0234 66.667 33.1558C66.6886 33.2882 66.7577 33.4075 66.8604 33.4901C67.0157 33.599 67.1858 33.6832 67.3651 33.7394C67.5684 33.8092 67.7868 33.877 68.0208 33.9388C68.2519 34.0054 68.473 34.1042 68.6784 34.2321C68.8826 34.3588 69.0554 34.5331 69.1831 34.7405C69.3259 34.9999 69.3931 35.2964 69.3766 35.5941C69.383 35.9007 69.3202 36.2044 69.1927 36.4816C69.0756 36.7274 68.9057 36.9422 68.6957 37.1098C68.4823 37.2842 68.238 37.4144 67.9764 37.4926C67.6918 37.5743 67.3975 37.6151 67.1023 37.6144C66.7382 37.6171 66.3766 37.5557 66.0329 37.433C65.6909 37.3033 65.3777 37.1038 65.1122 36.8467L66.0406 35.7956C66.173 35.9785 66.347 36.125 66.5472 36.2222C66.7438 36.3205 66.9593 36.3715 67.1777 36.372C67.2857 36.372 67.3934 36.3593 67.4986 36.3341C67.6013 36.3103 67.6997 36.2707 67.7906 36.2163C67.8749 36.1675 67.9471 36.0992 68.0016 36.0168C68.0554 35.9324 68.083 35.8329 68.0808 35.7317C68.0834 35.6483 68.0664 35.5654 68.0314 35.4901C67.9966 35.4147 67.9445 35.3491 67.8797 35.2991C67.722 35.183 67.5487 35.0917 67.3651 35.0278C67.1582 34.9541 66.936 34.8781 66.696 34.8043C66.4608 34.7313 66.235 34.6296 66.023 34.5011C65.8186 34.3754 65.6436 34.2044 65.5106 34.0007C65.3635 33.7552 65.292 33.4693 65.3057 33.181C65.3009 32.8818 65.3671 32.586 65.4991 32.3195C65.6203 32.0777 65.7914 31.8661 66 31.6993C66.2138 31.5243 66.4579 31.3924 66.7193 31.3104C66.9936 31.2265 67.2782 31.1842 67.5643 31.1847C67.8919 31.1845 68.2178 31.2342 68.5313 31.3322C68.8438 31.4302 69.1318 31.5978 69.3746 31.823L68.4811 32.838ZM70.7282 31.3463H74.7487V32.5868H72.0413V33.7255H74.6057V34.966H72.0336V36.2064H74.8997V37.4488H70.7282V31.3463ZM78.2182 31.3463H79.2895L81.8635 37.4488H80.3938L79.8833 36.1566H77.5918L77.0986 37.4488H75.6598L78.2182 31.3463ZM78.719 33.1211L77.9998 35.0177H79.4462L78.719 33.1211ZM82.7899 31.3463H85.0798C85.3675 31.3451 85.6548 31.375 85.9363 31.4359C86.1895 31.4896 86.4302 31.5926 86.6462 31.7391C86.8526 31.8824 87.0199 32.0782 87.1315 32.3076C87.2597 32.5855 87.3214 32.8912 87.3115 33.1991C87.3223 33.5923 87.2074 33.9784 86.9846 34.298C86.7521 34.6098 86.4108 34.816 86.033 34.8721L87.5357 37.4488H85.973L84.7373 35.0098H84.0934V37.4488H82.7899V31.3463ZM84.0934 33.871H84.8669C84.985 33.871 85.1088 33.871 85.2403 33.8591C85.3615 33.8532 85.481 33.827 85.5941 33.7814C85.6978 33.7399 85.7892 33.671 85.859 33.582C85.9349 33.4686 85.9716 33.3325 85.9634 33.1951C85.9702 33.0644 85.9378 32.935 85.8706 32.8241C85.811 32.7345 85.7306 32.6618 85.6366 32.6128C85.5341 32.562 85.4244 32.5284 85.3118 32.513C85.1926 32.4972 85.0723 32.4893 84.9521 32.489H84.0991L84.0934 33.871ZM92.4014 32.9318C92.2728 32.7726 92.1108 32.6457 91.9277 32.5608C91.7227 32.4717 91.5019 32.4281 91.2797 32.4331C91.0454 32.4308 90.8131 32.4803 90.599 32.5788C90.3936 32.6727 90.2088 32.8083 90.0557 32.9776C89.8985 33.161 89.7763 33.3736 89.6959 33.6037C89.5258 34.1131 89.5258 34.6662 89.6959 35.1753C89.7758 35.4033 89.8966 35.6136 90.0518 35.7956C90.1992 35.9693 90.3804 36.1091 90.5834 36.2064C90.7889 36.3044 91.0128 36.3541 91.2391 36.3519C91.4858 36.3566 91.7299 36.2977 91.9488 36.1804C92.1554 36.0658 92.3309 35.9 92.4595 35.6978L93.5462 36.5333C93.3062 36.8853 92.9762 37.1615 92.593 37.3313C92.2186 37.501 91.8144 37.5894 91.4054 37.5904C90.9696 37.5948 90.5366 37.5184 90.1272 37.3652C89.7509 37.2248 89.4067 37.0063 89.1158 36.7229C88.8271 36.4378 88.6008 36.0925 88.4525 35.7099C88.1352 34.8553 88.1352 33.9099 88.4525 33.0553C88.6013 32.6736 88.8276 32.3289 89.1158 32.0443C89.4067 31.7611 89.7509 31.5423 90.1272 31.4023C90.5366 31.2488 90.9696 31.1726 91.4054 31.1768C91.5804 31.1773 91.7551 31.1934 91.9277 31.2246C92.1106 31.2567 92.2901 31.3075 92.4634 31.3763C92.6422 31.4456 92.8118 31.5381 92.9681 31.6515C93.1354 31.7728 93.2834 31.92 93.407 32.0881L92.4014 32.9318ZM94.5809 31.3463H95.8862V33.6218H98.4178V31.3463H99.7212V37.4488H98.4178V34.8103H95.8862V37.4488H94.5809V31.3463Z"
+                    fill="#294199"
+                  />
+                </svg>
+              </div>
+            </div>
+          </a>
+          <h1 class="page-title">Healthcare Assistant</h1>
+          <div class="user-profile">
+            <div class="user-details">
+              <span class="welcome-text">Welcome</span>
+              <span class="user-name">User name</span>
+            </div>
+            <!--merged image-->
+            <div class="user-avatar">
+              <svg
+                width="60"
+                height="60"
+                viewBox="0 0 60 60"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="avatar-bg"
+              >
+                <circle cx="30" cy="30" r="30" fill="#009bb8" />
+              </svg>
+              <svg
+                width="52"
+                height="52"
+                viewBox="0 0 52 52"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                class="avatar-inner"
+              >
+                <circle cx="26" cy="26" r="26" fill="white" />
+              </svg>
+              <span class="user-initials">VK</span>
+            </div>
+          </div>
+        </header>
+      </div>
+    </section>
+
+    <section id="section-main">
+      <div class="page-container">
+        <main class="main-content">
+          <div class="document-viewer">
+            <div class="document-header">
+              <h2 class="document-title">Document Analyzer</h2>
+              <div class="file-info">
+                <!--merged image-->
+                <div class="file-icon">
+                  <svg
+                    width="26"
+                    height="31"
+                    viewBox="0 0 26 31"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect
+                      x="1.18"
+                      y="0"
+                      width="24.82"
+                      height="31"
+                      fill="#E5E5E5"
+                    />
+                    <rect
+                      x="0"
+                      y="10.37"
+                      width="1.18"
+                      height="2.39"
+                      fill="#CCCCCC"
+                    />
+                    <rect
+                      x="0"
+                      y="3.33"
+                      width="16.16"
+                      height="8.24"
+                      fill="#DDDDDD"
+                    />
+                    <rect
+                      x="6.72"
+                      y="13.41"
+                      width="13.73"
+                      height="12.29"
+                      fill="#F0F0F0"
+                    />
+                    <rect
+                      x="19.25"
+                      y="0"
+                      width="6.75"
+                      height="6.85"
+                      fill="#BBBBBB"
+                    />
+                    <rect
+                      x="3"
+                      y="4.78"
+                      width="10.16"
+                      height="4.18"
+                      fill="#CCCCCC"
+                    />
+                  </svg>
+                </div>
+                <span class="file-name">Sample file name.pdf</span>
+              </div>
+            </div>
+
+            <div class="summary-prompt">
+              Give me a summary about your document
+            </div>
+
+            <div class="content-area">
+              <div class="text-scroll-container">
+                <p class="document-text">
+                  Lorem Ipsum is simply dummy text of the printing and
+                  typesetting industry. Lorem Ipsum has been the industry's
+                  standard dummy text ever since the 1500s, when an unknown
+                  printer took a galley of type and scrambled it to make a type
+                  specimen book. It has survived not only five centuries, but
+                  also the leap into electronic typesetting, remaining
+                  essentially unchanged. It was popularized in the 1960s with
+                  the release of Letraset sheets containing Lorem Ipsum
+                  passages, and more recently with desktop publishing software
+                  like Aldus PageMaker including versions of Lorem Ipsum.<br /><br />Lorem
+                  Ipsum is simply dummy text of the printing and typesetting
+                  industry. Lorem Ipsum has been the industry's standard dummy
+                  text ever since the 1500s, when an unknown printer took a
+                  galley of type and scrambled it to make a type specimen book.
+                </p>
+              </div>
+              <div class="custom-scrollbar">
+                <div class="scrollbar-thumb"></div>
+              </div>
+            </div>
+            <hr class="divider" />
+            <div class="audio-controls">
+              <div class="generate-audio">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M8 1L10 6H15L11 9L12 14L8 11L4 14L5 9L1 6H6L8 1Z"
+                    fill="#666"
+                  />
+                </svg>
+                <span>Generate audio for the response</span>
+              </div>
+              <div class="audio-player">
+                <button class="play-button" title="Play audio"></button>
+                <span class="time-display">0:10 / 1:15</span>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-track"></div>
+                  <div class="progress-bar-filled"></div>
+                </div>
+                <svg
+                  class="volume-icon"
+                  width="23"
+                  height="18"
+                  viewBox="0 0 23 18"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path d="M1 6V12H4L9 17V1L4 6H1Z" fill="#666" />
+                  <path
+                    d="M15.54 0.46L14.12 1.88C16.89 4.65 16.89 9.35 14.12 12.12L15.54 13.54C19.68 9.4 19.68 2.6 15.54 0.46Z"
+                    fill="#666"
+                  />
+                </svg>
+                <div class="menu-dots">
+                  <span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="input-section">
+            <div class="input-container">
+              <textarea
+                placeholder="Give me a summary about your document |"
+              ></textarea>
+              <div class="input-actions">
+                <div class="language-selector">
+                  <span>English</span>
+                  <svg
+                    width="15"
+                    height="8"
+                    viewBox="0 0 15 8"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M1 1L7.5 7L14 1" stroke="#666" stroke-width="2" />
+                  </svg>
+                </div>
+                <button class="icon-button" title="Attach file">
+                  <svg
+                    width="35"
+                    height="35"
+                    viewBox="0 0 35 35"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M17.5 4.375C10.15 4.375 4.375 10.15 4.375 17.5C4.375 24.85 10.15 30.625 17.5 30.625C24.85 30.625 30.625 24.85 30.625 17.5C30.625 10.15 24.85 4.375 17.5 4.375ZM22.75 19.25H19.25V22.75H15.75V19.25H12.25V15.75H15.75V12.25H19.25V15.75H22.75V19.25Z"
+                      fill="#666"
+                    />
+                  </svg>
+                </button>
+                <button class="icon-button send-button" title="Send message">
+                  <svg
+                    width="35"
+                    height="35"
+                    viewBox="0 0 35 35"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2.1875 17.5L32.8125 2.1875L29.1667 32.8125L17.5 24.0625L2.1875 17.5ZM7.29167 17.5L17.5 20.4167L24.7917 7.29167L7.29167 17.5Z"
+                      fill="#284497"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <!-- Standard Navigation -->
+            <nav class="standard-nav">
+              <a href="homepage_ai_tool.html" class="nav-btn">Home</a>
+              <a
+                href="healthcare-assistant-document-analyzer.html"
+                class="nav-btn active"
+                >Document Analyzer</a
+              >
+              <a href="healthcare-assistant-text-to-speech.html" class="nav-btn"
+                >Translator</a
+              >
+              <a href="speech-to-text.html" class="nav-btn"
+                >Audio Transcription</a
+              >
+              <a href="clinical_chat.html" class="nav-btn">Healthcare Chat</a>
+              <a href="organ-analyzer.html" class="nav-btn"
+                >Organ Scan Analysis</a
+              >
+            </nav>
+          </div>
+        </main>
+      </div>
+    </section>
+
+    <section id="section-footer">
+      <div class="page-container">
+        <div class="footer-bg-wrapper">
+          <!--merged image-->
+          <div class="bg-graphic bg-left">
+            <svg
+              width="656"
+              height="358"
+              viewBox="0 0 656 358"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 358C100 300 200 250 300 200C400 150 500 100 656 50V358H0Z"
+                fill="#E2E9FF"
+              />
+            </svg>
+            <svg
+              width="510"
+              height="316"
+              viewBox="0 0 510 316"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 316C80 270 160 220 240 170C320 120 400 70 510 20V316H0Z"
+                fill="#284497"
+                opacity="0.2"
+              />
+            </svg>
+            <svg
+              width="333"
+              height="278"
+              viewBox="0 0 333 278"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M0 278C60 240 120 200 180 160C240 120 300 80 333 40V278H0Z"
+                fill="#284497"
+                opacity="0.1"
+              />
+            </svg>
+          </div>
+          <!--merged image-->
+          <div class="bg-graphic bg-right">
+            <svg
+              width="597"
+              height="326"
+              viewBox="0 0 597 326"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M597 326C497 268 397 218 297 168C197 118 97 68 0 18V326H597Z"
+                fill="#E2E9FF"
+              />
+            </svg>
+            <svg
+              width="465"
+              height="288"
+              viewBox="0 0 465 288"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M465 288C385 242 305 192 225 142C145 92 65 42 0 -8V288H465Z"
+                fill="#284497"
+                opacity="0.2"
+              />
+            </svg>
+            <svg
+              width="304"
+              height="253"
+              viewBox="0 0 304 253"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M304 253C244 215 184 175 124 135C64 95 4 55 0 15V253H304Z"
+                fill="#284497"
+                opacity="0.1"
+              />
+            </svg>
+          </div>
+        </div>
+        <footer class="site-footer">
+          <p class="copyright">
+            ©2025 Velocity Clinical Research | All Rights Reserved
+          </p>
+        </footer>
+      </div>
+    </section>
+  </body>
+</html>

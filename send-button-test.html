@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Send Button Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+      .success {
+        color: green;
+      }
+      .error {
+        color: red;
+      }
+      button {
+        padding: 10px 20px;
+        margin: 10px;
+        cursor: pointer;
+      }
+      input {
+        margin: 5px;
+        padding: 5px;
+        width: 300px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Send Button Test</h1>
+
+    <div class="test-section">
+      <h2>Text-to-Speech Send Button Test</h2>
+      <input
+        type="text"
+        id="textInput"
+        placeholder="Enter text to translate"
+        value="Hello world"
+      />
+      <button onclick="testTextToSpeech()">
+        Test Send Button (Translation)
+      </button>
+      <div id="ttsResult"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>Speech-to-Text Send Button Test</h2>
+      <p>Note: This requires an actual audio file to test properly</p>
+      <input type="file" id="audioFile" accept="audio/*" />
+      <button onclick="testSpeechToText()">
+        Test Send Button (Transcription)
+      </button>
+      <div id="sttResult"></div>
+    </div>
+
+    <script>
+      const API_BASE = "http://localhost:5001/api";
+
+      async function testTextToSpeech() {
+        const text = document.getElementById("textInput").value;
+
+        if (!text.trim()) {
+          document.getElementById("ttsResult").innerHTML =
+            '<div class="error">✗ Error: Please enter text (matches frontend validation)</div>';
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE}/translate`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              text: text,
+              sourceLanguage: "en",
+              targetLanguage: "es",
+            }),
+          });
+
+          const data = await response.json();
+          document.getElementById(
+            "ttsResult"
+          ).innerHTML = `<div class="success">✓ Text-to-Speech Send Button Works!<br>Translation: ${data.data.translatedText}</div>`;
+        } catch (error) {
+          document.getElementById(
+            "ttsResult"
+          ).innerHTML = `<div class="error">✗ Send Button Error: ${error.message}</div>`;
+        }
+      }
+
+      async function testSpeechToText() {
+        const fileInput = document.getElementById("audioFile");
+
+        if (!fileInput.files[0]) {
+          document.getElementById("sttResult").innerHTML =
+            '<div class="error">✗ Error: Please select an audio file (matches frontend validation)</div>';
+          return;
+        }
+
+        try {
+          const formData = new FormData();
+          formData.append("audio", fileInput.files[0]);
+          formData.append("outputLanguage", "en");
+
+          const response = await fetch(`${API_BASE}/transcription`, {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await response.json();
+          document.getElementById(
+            "sttResult"
+          ).innerHTML = `<div class="success">✓ Speech-to-Text Send Button Works!<br>Response: ${JSON.stringify(
+            data,
+            null,
+            2
+          )}</div>`;
+        } catch (error) {
+          document.getElementById(
+            "sttResult"
+          ).innerHTML = `<div class="error">✗ Send Button Error: ${error.message}</div>`;
+        }
+      }
+    </script>
+  </body>
+</html>
