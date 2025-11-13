@@ -233,8 +233,11 @@ const handleAnalyze = async (req, res) => {
       
       const pythonScriptPath = path.join(__dirname, '..', 'python_services', 'organ_vision_model.py');
       
+      // Use python3 on Linux/Unix systems (like Render), python on Windows
+      const pythonCommand = process.platform === 'win32' ? 'python' : 'python3';
+      
       // Call Python script
-      const pythonProcess = spawn('python', [pythonScriptPath]);
+      const pythonProcess = spawn(pythonCommand, [pythonScriptPath]);
       
       // Send data to Python script
       const inputData = JSON.stringify({
