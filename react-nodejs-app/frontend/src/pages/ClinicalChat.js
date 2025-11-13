@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import './ClinicalChat.css';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:5001/api';
+import { API_BASE_URL } from '../config/api';
 
 function ClinicalChat() {
   const [messages, setMessages] = useState([]);
